@@ -7,10 +7,24 @@ app.get('/COMP4537/labs/3/getDate/', (req, res) => {
 
   const greeting = `Hello ${name}, What a beautiful day. Server current date and time is ${currentTime}`;
 
-  res.setHeader('Content-Type', 'text/plain');
-  res.setHeader('Content-Color', 'blue');
+  const htmlResponse = `
+    <html>
+        <head>
+        <style>
+            body {
+            color: blue;
+            }
+        </style>
+        </head>
+        <body>
+        <p>Hello ${name}, What a beautiful day. Server current date and time is ${currentTime}</p>
+        </body>
+    </html>
+    `;
 
-  res.send(greeting);
+  res.setHeader('Content-Type', 'text/html');
+
+  res.send(htmlResponse);
 });
 
 const PORT = process.env.PORT || 3000;
