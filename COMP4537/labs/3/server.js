@@ -42,11 +42,11 @@ const server = http.createServer((req, res) => {
     let parts = parsedUrl.pathname.split('/');
     let file_name = parts.pop() || parts.pop();
 
-    fs.readFile(`./COMP4537/labs/3/${file_name}`, (err, data) => {
+    fs.readFile(`./${file_name}`, (err, data) => {
       if (!err && data) {
-        res.writeHead(200, {'Content-Type': 'text/html'});
+        res.writeHead(200, {'Content-Type': 'text/plain'});
         res.write(data);
-        // return res.end();
+        res.end();
       } else {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
         res.end(`404!! Could not find the file name: ${file_name}`);
@@ -60,7 +60,8 @@ const server = http.createServer((req, res) => {
 });
 
 const fileWriter = (fileName, data) => {
-  let absPathTextFile = `./COMP4537/labs/3/${fileName}`
+  // let absPathTextFile = `./COMP4537/labs/3/${fileName}`
+  let absPathTextFile = `./${fileName}`
 
   fs.appendFile(absPathTextFile, data + "\n", (err) => {
     if (err) throw err;
