@@ -19,7 +19,8 @@
             e.preventDefault();
             const word = document.getElementById('searchWord').value;
             const xhr = new XMLHttpRequest();
-            xhr.open('GET', `/api/definitions?word=${encodeURIComponent(word)}`, true);
+            xhr.open('GET', `https://lab4-ray-deji-minimal-dict.onrender.com/?word=${encodeURIComponent(word)}`, true);
+            // xhr.open('GET', `http://localhost:3000/?word=${encodeURIComponent(word)}`, true);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
