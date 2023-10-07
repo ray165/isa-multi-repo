@@ -3,9 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab4 Store</title>
+    <title>Store Definition</title>
 </head>
 <body>
-    
+    <h1>Store Definition</h1>
+    <form id="definitionForm">
+        <label for="word">Word:</label>
+        <input type="text" id="word" name="word" required><br><br>
+        <label for="definition">Definition:</label>
+        <textarea id="definition" name="definition" required></textarea><br><br>
+        <input type="submit" value="Submit">
+    </form>
+    <div id="feedback"></div>
+
+    <script>
+        document.getElementById('definitionForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const word = document.getElementById('word').value;
+            const definition = document.getElementById('definition').value;
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/definitions', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 201) {
+                        document.getElementById('feedback').innerText = 'Definition stored successfully: ' + JSON.parse(xhr.responseText).entry;
+                    } else {
+                        document.getElementById('feedback').innerText = 'Error: ' + JSON.parse(xhr.responseText).message;
+                    }
+                }
+            };
+            xhr.send('word=' + encodeURIComponent(word) + '&definition=' + encodeURIComponent(definition));
+        });
+    </script>
 </body>
 </html>
