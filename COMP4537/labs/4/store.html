@@ -28,7 +28,9 @@
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 201) {
-                        document.getElementById('feedback').innerText = 'Definition stored successfully: ' + JSON.parse(xhr.responseText).entry;
+                        document.getElementById('feedback').innerText = 'Definition stored successfully: ' + '<br />' +
+                            JSON.parse(xhr.responseText).message + 
+                            '<br />' + JSON.parse(xhr.responseText).entry;
                     } else {
                         document.getElementById('feedback').innerText = 'Error: ' + JSON.parse(xhr.responseText).message;
                     }
