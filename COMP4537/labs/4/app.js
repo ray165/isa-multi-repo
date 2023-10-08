@@ -2,14 +2,12 @@ const http = require('http');
 const url = require('url');
 const qs = require('querystring');
 
-// Create an array to store word definitions
 const dictionary = [];
 const headers = { 
   'Content-Type': 'application/json',
   "Access-Control-Allow-Origin": "*"
 };
 
-// Function to handle POST requests
 function handlePostRequest(request, response) {
   let body = '';
 
@@ -39,7 +37,6 @@ function handlePostRequest(request, response) {
   });
 }
 
-// Function to handle GET requests
 function handleGetRequest(request, response) {
   const query = url.parse(request.url, true).query;
   const word = query.word;
