@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patient Database</title>
+</head>
+<body>
+    <h1>Patient Database</h1>
+    
+    <button id="insertButton">Insert Data</button>
+    <textarea id="queryText" placeholder="Enter SQL query"></textarea>
+    <button id="executeButton">Execute Query</button>
+    <div id="response"></div>
+    
+    <script>
+        const defaultPayload = [
+            "INSERT INTO patient (name, dateOfBirth) VALUES ('Sarah Brown', '1901-01-01')",
+            "INSERT INTO patient (name, dateOfBirth) VALUES ('John Smith', '1941-01-01')",
+            "INSERT INTO patient (name, dateOfBirth) VALUES ('Jack Ma', '1961-01-30')",
+            "INSERT INTO patient (name, dateOfBirth) VALUES ('Elon Musk', '1999-01-01')",
+        ]
+
+        document.getElementById('insertButton').addEventListener('click', function() {
+            defaultPayload.forEach((query) => sendRequest('POST', query))
+        });
+
+        document.getElementById('executeButton').addEventListener('click', function() {
+            const query = document.getElementById('queryText').value;
+            const method = query.trim().toUpperCase().startsWith('INSERT') ? 'POST' : 'GET';
+            sendRequest(method, query);
+        });
+
+        function sendRequest(method, query) {
+            const xhr = new XMLHttpRequest();
+            xhr.open(method, '/api/v1/sql', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        document.getElementById('response').textContent = xhr.responseText;
+                    } else {
+                        document.getElementById('response').textContent = "Error: " + xhr.responseText;
+                    }
+                }
+            };
+
+            xhr.send(JSON.stringify({ query: query }));
+        }
+    </script>
+</body>
+</html>
