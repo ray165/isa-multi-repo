@@ -13,13 +13,13 @@
     
     <script>
         const defaultPayload = [
-            "INSERT INTO patient (name, dateOfBirth) VALUES ('Sarah Brown', '1901-01-01')",
-            "INSERT INTO patient (name, dateOfBirth) VALUES ('John Smith', '1941-01-01')",
-            "INSERT INTO patient (name, dateOfBirth) VALUES ('Jack Ma', '1961-01-30')",
-            "INSERT INTO patient (name, dateOfBirth) VALUES ('Elon Musk', '1999-01-01')",
+            "INSERT INTO patients (name, dateOfBirth) VALUES ('Sarah Brown', '1901-01-01')",
+            "INSERT INTO patients (name, dateOfBirth) VALUES ('John Smith', '1941-01-01')",
+            "INSERT INTO patients (name, dateOfBirth) VALUES ('Jack Ma', '1961-01-30')",
+            "INSERT INTO patients (name, dateOfBirth) VALUES ('Elon Musk', '1999-01-01')",
         ];
 
-        const base_url = "";
+        const base_url = "http://127.0.0.1:3000";
 
         document.getElementById('insertButton').addEventListener('click', function() {
             defaultPayload.forEach((query) => sendRequest('POST', query, base_url + "/api/v1/sql/insertDefault"))
@@ -27,7 +27,8 @@
 
         document.getElementById('executeButton').addEventListener('click', function() {
             const query = document.getElementById('queryText').value;
-            const method = query.trim().toUpperCase().startsWith('INSERT') ? 'POST' : 'GET';
+            // const method = query.trim().toUpperCase().startsWith('INSERT') ? 'POST' : 'GET';
+            const method = 'POST';
             sendRequest(method, query, base_url + "/api/v1/sql/runQuery");
         });
 
@@ -45,7 +46,7 @@
                     }
                 }
             };
-
+            console.log('sqlQuery =' + JSON.stringify({ query: query }));
             xhr.send(JSON.stringify({ query: query }));
         }
     </script>
