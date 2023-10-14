@@ -17,21 +17,23 @@
             "INSERT INTO patient (name, dateOfBirth) VALUES ('John Smith', '1941-01-01')",
             "INSERT INTO patient (name, dateOfBirth) VALUES ('Jack Ma', '1961-01-30')",
             "INSERT INTO patient (name, dateOfBirth) VALUES ('Elon Musk', '1999-01-01')",
-        ]
+        ];
+
+        const base_url = "";
 
         document.getElementById('insertButton').addEventListener('click', function() {
-            defaultPayload.forEach((query) => sendRequest('POST', query))
+            defaultPayload.forEach((query) => sendRequest('POST', query, base_url + "/api/v1/sql/insertDefault"))
         });
 
         document.getElementById('executeButton').addEventListener('click', function() {
             const query = document.getElementById('queryText').value;
             const method = query.trim().toUpperCase().startsWith('INSERT') ? 'POST' : 'GET';
-            sendRequest(method, query);
+            sendRequest(method, query, base_url + "/api/v1/sql/runQuery");
         });
 
-        function sendRequest(method, query) {
+        function sendRequest(method, query, endpoint) {
             const xhr = new XMLHttpRequest();
-            xhr.open(method, '/api/v1/sql', true);
+            xhr.open(method, endpoint, true);
             xhr.setRequestHeader('Content-Type', 'application/json');
             
             xhr.onreadystatechange = function () {
