@@ -107,6 +107,13 @@ var handleExecute = (req, res) => {
             const data = JSON.parse(body);
             const query = data.query;
             console.log(query);
+            
+            if (!isQueryValid(query)) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end("Query is invalid. Contains: DROP or UPDATE");
+                return;
+            }
+
             handleQuery(res, query);
         });
     }
@@ -148,6 +155,16 @@ const handleQuery = (res, query) => {
             res.end(JSON.stringify(results));
         }
     });
+}
+
+const isQueryValid = (query) => {
+    const invalids = ['DROP', 'UPDATE', 'DELETE']
+    for (let val in invalids) {
+        if (query.toUpperCase().includes(val)) {
+            return false
+        }
+    }
+    return true
 }
 
 const port = 3000; // Change to your desired port number
