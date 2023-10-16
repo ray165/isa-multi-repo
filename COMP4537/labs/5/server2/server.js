@@ -15,10 +15,12 @@ const create_table = "CREATE TABLE IF NOT EXISTS patients (\
 var conString = process.env.ELPHA_URL //Can be found in the Details page
 var db = new pg.Client(conString);
 
-db.connect((err) => {
-    if (err) throw err;
-    console.log('Connected to database.');
-});
+db.connect();
+
+// db.connect((err) => {
+//     if (err) throw err;
+//     console.log('Connected to database.');
+// });
 
 const headers = { 
     'Content-Type': 'text/plain',
