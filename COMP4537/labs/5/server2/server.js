@@ -6,11 +6,6 @@ const url = require('url');
 var pg = require('pg');
 require('dotenv').config();
 
-// my sql create table
-// const create_table = "CREATE TABLE IF NOT EXISTS patients (\
-//     id SERIAL PRIMARY KEY,\
-//     name VARCHAR(100) NOT NULL,\
-//     dateOfBirth DATETIME";
 const create_table = "CREATE TABLE IF NOT EXISTS patients (\
     id SERIAL PRIMARY KEY,\
     name VARCHAR(100) NOT NULL,\
@@ -19,15 +14,6 @@ const create_table = "CREATE TABLE IF NOT EXISTS patients (\
 
 var conString = process.env.ELPHA_URL //Can be found in the Details page
 var db = new pg.Client(conString);
-
-// my sql connection
-// const db = mysql.createConnection({
-//     host: 'sql.freedb.tech',
-//     user: process.env.SQL_USER || 'freedb_rayadmin',
-//     password: process.env.SQL_PASS || 'your_password',  // add env variable
-//     database: 'freedb_lab5-db',
-//     port: 3306
-// });
 
 db.connect((err) => {
     if (err) throw err;
@@ -41,24 +27,25 @@ const headers = {
   };
 
 const server = http.createServer((req, res) => {
+    const acceptedQuery = "query=select%20*%20from%20patients"
     const { method } = req;
-    const execute = true;
     const parsedUrl = url.parse(req.url);
+    const query = parsedUrl.query;
     const pathname = parsedUrl.pathname;
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Request-Method', '*');
     res.setHeader('Access-Control-Allow-Methods', '*');
     res.setHeader('Access-Control-Allow-Headers', '*');
 
-    console.log(req.method);
-    console.log(pathname);
-    console.log('body' + req.body);
-
-    if (req.method === 'POST') {
+    if (method === 'POST') {
         console.log("execute");
         handleExecute(req, res);
     }
-    else if (req.method === 'OPTIONS') {
+    else if (method === 'GET' && query === acceptedQuery) {
+        console.log("GET All Method running");
+        handleReadAll(req, res);
+    }
+    else if (method === 'OPTIONS') {
         res.writeHead(200);
         res.end("Server is running");
         return;
@@ -69,32 +56,10 @@ const server = http.createServer((req, res) => {
     }
 });
 
-var handleInsertDefault = (req, res) => {
-    let body = '';
-    req.on('data', (chunk) => {
-        body += chunk;
-    });
-
-    req.on('end', () => {
-        const data = JSON.parse(body);
-        const query = data.query;
-        console.log(query);
-        handleQuery(res, query);
-    });
-}
-
 var handleReadAll = (req, res) => {
-    req.on('end', () => {
-        try {
-            const query = "SELECT * FROM patients";
-            handleQuery(res, query);
-        } catch (error) {
-            res.writeHead(400, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Invalid JSON data' }));
-        }
-    });
+    const query = "SELECT * FROM patients";
+    handleQuery(res, query);
 }
-
 var handleExecute = (req, res) => {
     if (req.method === 'POST') {
         console.log("POST Method running");
@@ -107,12 +72,18 @@ var handleExecute = (req, res) => {
             const data = JSON.parse(body);
             const query = data.query;
             console.log(query);
+            console.log('isValid' + isQueryValid(query));
+            if (!isQueryValid(query)) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end("Query is invalid. Contains: DROP, UPDATE or DELETE");
+                return;
+            }
+
             handleQuery(res, query);
         });
     }
     else if (req.method === 'GET'){
         console.log("GET Method running");
-        console.log(req.url);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end("GET Request");
         return
@@ -122,9 +93,7 @@ var handleExecute = (req, res) => {
 const handleQuery = (res, query) => {
     console.log("handleQuery");
     console.log(query);
-    console.log("dbPAss: " + process.env.SQL_PASS)
     
-
     // Create default table
     db.query(create_table, (err, results) => {
         if (err) {
@@ -138,16 +107,30 @@ const handleQuery = (res, query) => {
     db.query(query, (error, results) => {
         console.log("db.query results");
         console.log(error);
-        console.log(results);
+        console.log(results.rows);
 
         if (error) {
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: error.message }));
         } else {
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(results));
+            if (results.rows == null) {
+                res.end("No results found");
+                return;
+            }
+            res.end(JSON.stringify(results.rows));
         }
     });
+}
+
+const isQueryValid = (query) => {
+    const invalids = ['DROP', 'UPDATE', 'DELETE']
+    for (const val of invalids) {
+        if (query.toUpperCase().includes(val)) {
+            return false
+        }
+    }
+    return true
 }
 
 const port = 3000; // Change to your desired port number
