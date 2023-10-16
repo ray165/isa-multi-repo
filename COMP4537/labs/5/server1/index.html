@@ -19,7 +19,8 @@
             "INSERT INTO patients (name, dateOfBirth) VALUES ('Elon Musk', '1999-01-01')",
         ];
 
-        const base_url = "http://127.0.0.1:3000";
+        // const base_url = "http://127.0.0.1:3000";
+        const base_url = "https://lab5-db-intro.onrender.com";
 
         document.getElementById('insertButton').addEventListener('click', function() {
             defaultPayload.forEach((query) => sendRequest('POST', query, base_url + "/api/v1/sql/insertDefault"))
