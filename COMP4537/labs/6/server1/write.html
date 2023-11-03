@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dictionary Entry</title>
+</head>
+<body>
+  <h1>Create Dictionary Entry</h1>
+  <form id="entry-form">
+    <label for="word">Word:</label>
+    <input type="text" id="word" name="word" required><br>
+
+    <label for="definition">Definition:</label>
+    <textarea id="definition" name="definition" rows="4" required></textarea><br>
+
+    <label for="word-language">Word Language:</label>
+    <select id="word-language" name="word-language">
+      <!-- You can populate this dynamically from the Server2 /api/v1/languages endpoint -->
+      <option value="en">English</option>
+      <option value="zh-Hans">Simplified Chinese</option>
+      <!-- Add more language options as needed -->
+    </select><br>
+
+    <label for="definition-language">Definition Language:</label>
+    <select id="definition-language" name="definition-language">
+      <!-- Same as word language, populate this dynamically -->
+    </select><br>
+
+    <input type="submit" value="Submit">
+  </form>
+
+  <script src="main.js"></script>
+</body>
+</html>
