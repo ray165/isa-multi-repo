@@ -1,0 +1,11 @@
+{
+    "entryConflict": "The word \"%WORD%\" already exists. Would you like to update the definition using PATCH?",
+    "entryNotFound": "The word \"%WORD%\" does not exist in the dictionary.",
+    "entryCreated": "Entry created successfully",
+    "entryUpdated": "Definition updated successfully",
+    "entryDeleted": "Entry deleted successfully",
+    "networkError": "Network error: %ERROR%",
+    "languagesRetrieved": "Languages retrieved successfully",
+    "messageNotFound": "Message not found"
+  }
+  

@@ -19,8 +19,11 @@
   },
   "homepage": "https://github.com/ray165/isa-multi-repo#readme",
   "dependencies": {
+    "body-parser": "^1.20.2",
     "dotenv": "^16.3.1",
+    "express": "^4.18.2",
     "mysql": "^2.18.1",
+    "path": "^0.12.7",
     "pg": "^8.11.3"
   }
 }

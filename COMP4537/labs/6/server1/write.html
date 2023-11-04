@@ -17,7 +17,7 @@
       <!-- You can populate this dynamically from the Server2 /api/v1/languages endpoint -->
       <option value="en">English</option>
       <option value="zh-Hans">Simplified Chinese</option>
-      <!-- Add more language options as needed -->
+      <option value="zh-Hans">Simplified Chinese</option>
     </select><br>
 
     <label for="definition-language">Definition Language:</label>
@@ -28,6 +28,49 @@
     <input type="submit" value="Submit">
   </form>
 
-  <script src="main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const entryForm = document.getElementById('entry-form');
+      entryForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const word = document.getElementById('word').value;
+        const definition = document.getElementById('definition').value;
+        const wordLanguage = document.getElementById('word-language').value;
+        const definitionLanguage = document.getElementById('definition-language').value;
+
+        const data = {
+          word,
+          definition,
+          'word-language': wordLanguage,
+          'definition-language': definitionLanguage,
+        };
+
+        try {
+          const response = await fetch('/api/v1/definition', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          });
+
+          if (response.status === 201) {
+            const result = await response.json();
+            alert('Entry created successfully');
+            console.log('New entry:', result.entry);
+            console.log('Total entries:', result.total);
+          } else if (response.status === 409) {
+            const errorData = await response.json();
+            alert(`Word conflict: ${errorData.message}`);
+          } else {
+            alert('An error occurred while creating the entry');
+          }
+        } catch (error) {
+          alert('Network error: ' + error.message);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
