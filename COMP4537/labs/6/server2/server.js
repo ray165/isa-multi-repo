@@ -3,12 +3,18 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Client } = require('pg');
+const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
+
 const port = 3000; // Change this to your desired port
 
+// Enable All CORS Requests
+app.use(cors());
+
 // Configure your ElephantSQL database connection
-const connectionString = 'INSERT_YOUR_ELEPHANTSQL_URL_HERE'; // Replace with your ElephantSQL URL
+const connectionString = process.env.ELPHA_URL; // Replace with your ElephantSQL URL
 const client = new Client({
   connectionString: connectionString,
 });
@@ -22,12 +28,20 @@ client.connect((err) => {
   }
 });
 
+const create_table = "CREATE TABLE IF NOT EXISTS entry (\
+  id SERIAL PRIMARY KEY,\
+  word VARCHAR(100) NOT NULL,\
+  definition TEXT,\
+  word_language VARCHAR(20),\
+  definition_language VARCHAR(20)\
+)";
 // Middleware to parse JSON in the request body
 app.use(bodyParser.json());
 
 // 1. Create a new dictionary entry
 app.post('/api/v1/definition', async (req, res) => {
-  const { word, definition, 'word-language': wordLanguage, 'definition-language': definitionLanguage } = req.body;
+  console.log(req.body);
+  const { word, definition, 'word-language': wordLanguage, 'definition-language': definitionLanguage } = req.body.query;
 
   // Check if the word already exists in the database
   const checkWordQuery = 'SELECT * FROM entry WHERE word = $1';
@@ -152,7 +166,7 @@ app.get('/api/v1/languages', async (req, res) => {
     code: row.code,
     name: row.name,
   }));
-
+  console.log(languages);
   res.json({ languages });
 });
 
@@ -170,4 +184,11 @@ function getUserMessage(messageKey) {
 // Start the Express server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+  client.query(create_table, (err, result) => {
+    if (err) {
+      console.log('Error creating table:', err);
+    } else {
+      console.log('Table created successfully.');
+    }
+  });
 });

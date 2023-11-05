@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Search</title>
+</head>
+<body>
+  <h1>Search Dictionary</h1>
+  <form id="search-form">
+    <label for="word">Search Word:</label>
+    <input type="text" id="word-search" name="word-search" required><br>
+    <input type="submit" value="Search">
+  </form>
+  
+  <div id="search-results">
+    <!--Display Results -->
+  </div>
+
+  <script>
+    const base_url = "http://127.0.0.1:3000";
+
+    function sendRequest(method, query, endpoint, callback) {
+      const xhr = new XMLHttpRequest();
+      xhr.open(method, endpoint, true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            callback(xhr.responseText);
+          } else if (xhr.status === 404) {
+            callback(JSON.stringify({ error: "Not Found", message: "The word you searched for was not found." }));
+            console.error("Error: " + xhr.responseText);
+          }
+        }
+      };
+      xhr.send(JSON.stringify({ query: query }));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchForm = document.getElementById('search-form');
+      searchForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const wordSearch = document.getElementById('word-search').value;
+        sendRequest('GET', null, base_url + '/api/v1/definition/' + wordSearch, function(res) {
+          const response = JSON.parse(res);
+          const searchResults = document.getElementById('search-results');
+
+          if (response.error) {
+            searchResults.textContent = `Error: ${response.error}\nMessage: ${response.message}`;
+          } else {
+            searchResults.innerHTML = response.definition;
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

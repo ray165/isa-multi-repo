@@ -13,25 +13,62 @@
     <textarea id="definition" name="definition" rows="4" required></textarea><br>
 
     <label for="word-language">Word Language:</label>
-    <select id="word-language" name="word-language">
-      <!-- You can populate this dynamically from the Server2 /api/v1/languages endpoint -->
-      <option value="en">English</option>
-      <option value="zh-Hans">Simplified Chinese</option>
-      <option value="zh-Hans">Simplified Chinese</option>
-    </select><br>
+    <select id="word-language" name="word-language"></select><br>
 
     <label for="definition-language">Definition Language:</label>
-    <select id="definition-language" name="definition-language">
-      <!-- Same as word language, populate this dynamically -->
-    </select><br>
+    <select id="definition-language" name="definition-language"></select><br>
 
     <input type="submit" value="Submit">
   </form>
 
   <script>
+    const base_url = "http://127.0.0.1:3000";
+
+    function populateLanguageSelectors() {
+      sendRequest('GET', null, base_url + '/api/v1/languages', function(res) {
+        const data = JSON.parse(res);
+
+        const wordLanguageSelect = document.getElementById('word-language');
+        const definitionLanguageSelect = document.getElementById('definition-language');
+
+        data.languages.forEach((language) => {
+          const optionForWord = document.createElement('option');
+          optionForWord.value = language.code;
+          optionForWord.textContent = language.name;
+
+          const optionForDefinition = optionForWord.cloneNode(true);
+
+          wordLanguageSelect.appendChild(optionForWord);
+          definitionLanguageSelect.appendChild(optionForDefinition);
+        });
+      });
+    }
+
+    function sendRequest(method, query, endpoint, callback) {
+      const xhr = new XMLHttpRequest();
+      xhr.open(method, endpoint, true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+
+      xhr.onreadystatechange = function () {
+          if (xhr.readyState === XMLHttpRequest.DONE) {
+              const response = JSON.parse(xhr.responseText);
+              console.log(response);
+              console.log(xhr.responseText);
+              if (xhr.status === 200) {
+                callback(xhr.responseText);
+              } else {
+                callback(response);
+              }
+          }
+      };
+      xhr.send(JSON.stringify({ query: query }));
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+      populateLanguageSelectors();
+
       const entryForm = document.getElementById('entry-form');
-      entryForm.addEventListener('submit', async (e) => {
+      entryForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
         const word = document.getElementById('word').value;
@@ -45,30 +82,18 @@
           'word-language': wordLanguage,
           'definition-language': definitionLanguage,
         };
-
-        try {
-          const response = await fetch('/api/v1/definition', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-          });
-
-          if (response.status === 201) {
-            const result = await response.json();
-            alert('Entry created successfully');
-            console.log('New entry:', result.entry);
-            console.log('Total entries:', result.total);
-          } else if (response.status === 409) {
-            const errorData = await response.json();
-            alert(`Word conflict: ${errorData.message}`);
+        sendRequest('POST', data, base_url + '/api/v1/definition', function(res) {
+          const response = res;
+          console.log(response);
+          if (response.error) {
+            alert(`${response.error}\n${response.message}`);
+            console.error("Error: " + response.message);
           } else {
-            alert('An error occurred while creating the entry');
-          }
-        } catch (error) {
-          alert('Network error: ' + error.message);
-        }
+            alert('Entry created successfully');
+            console.log('New entry:', response.entry);
+            console.log('Total entries:', response.total);
+          } 
+        });
       });
     });
   </script>
