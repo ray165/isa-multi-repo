@@ -10,6 +10,12 @@
     <input type="text" id="word-search" name="word-search" required><br>
     <input type="submit" value="Search">
   </form>
+
+  <form id="delete-form">
+    <label for="word">Search Word:</label>
+    <input type="text" id="delete-word" name="delete-word"><br>
+    <input type="submit" value="delete">
+  </form>
   
   <div id="search-results">
     <!--Display Results -->
@@ -55,6 +61,24 @@
           }
         });
       });
+
+      const deleteForm = document.getElementById('delete-form');
+      deleteForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const wordToDelete = document.getElementById('delete-word').value;
+        sendRequest('DELETE', null, base_url + '/api/v1/definition/' + wordToDelete, (res) => {
+          const response = JSON.parse(res);
+          const searchResults = document.getElementById('search-results');
+
+          if (response.error) {
+            searchResults.textContent = `Error: ${response.error}\nMessage: ${response.message}`;
+          } else {
+            searchResults.innerHTML = response.message;
+          }
+        });
+      });
+
     });
   </script>
 </body>

@@ -87,8 +87,20 @@
           const response = res;
           console.log(response);
           if (response.error) {
-            alert(`${response.error}\n${response.message}`);
+            let willPatchDefinition = confirm(`${response.error}\n${response.message}`);
             console.error("Error: " + response.message);
+            if (willPatchDefinition == true) {
+                sendRequest('PATCH', data, base_url + '/api/v1/definition', (res) => {
+                    const patchResponse = res;
+                    console.log(patchResponse);
+                    if (patchResponse.error) {
+                        console.error("Error: " + patchResponse.message);
+                    } else {
+                        console.log('New entry:', patchResponse.entry);
+                        console.log('Total entries:', patchResponse.total);
+                    }
+                })
+            }
           } else {
             alert('Entry created successfully');
             console.log('New entry:', response.entry);
