@@ -73,8 +73,8 @@ app.post('/api/v1/definition', async (req, res) => {
 
 // 2. Update the definition of an existing word
 app.patch('/api/v1/definition/:word', async (req, res) => {
-  const { word } = req.params;
-  const { definition } = req.body;
+  console.log(req.body);
+  const { word, definition, 'word-language': wordLanguage, 'definition-language': definitionLanguage } = req.body.query;
 
   // Check if the word exists in the database
   const checkWordQuery = 'SELECT * FROM entry WHERE word = $1';
